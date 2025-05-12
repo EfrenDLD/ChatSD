@@ -1,83 +1,53 @@
-package server;
+package client;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import client.ui.ChatUI;
 import java.io.*;
-import java.net.*;
+import java.net.Socket;
+import javax.swing.*;
 
 public class ChatClient {
-    private JFrame frame;
-    private JTextArea chatArea;
-    private JTextField inputField;
-    private PrintWriter out;
+    private Socket socket;
     private BufferedReader in;
+    private PrintWriter out;
     private String username;
+    private ChatUI ui;
 
     public ChatClient() {
-        requestUsername();
-        initGUI();
-        connect();
-        listenMessages();
-    }
-
-    private void requestUsername() {
-        username = JOptionPane.showInputDialog(null, "Ingrese su nombre de usuario:", "Nombre", JOptionPane.PLAIN_MESSAGE);
-        if (username == null || username.trim().isEmpty()) {
+        this.username = JOptionPane.showInputDialog("Ingresa tu usuario:");
+        if (username == null || username.isEmpty())
             System.exit(0);
-        }
-    }
 
-    private void initGUI() {
-        frame = new JFrame("Chat de Java - " + username);
-        chatArea = new JTextArea();
-        chatArea.setEditable(false);
-        chatArea.setBackground(Color.BLACK);
-        chatArea.setForeground(Color.GREEN);
-        chatArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-
-        inputField = new JTextField();
-        inputField.addActionListener(e -> sendMessage());
-
-        frame.setLayout(new BorderLayout());
-        frame.add(new JScrollPane(chatArea), BorderLayout.CENTER);
-        frame.add(inputField, BorderLayout.SOUTH);
-
-        frame.setSize(500, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
-
-    private void connect() {
         try {
-            Socket socket = new Socket("localhost", 9090);
-            out = new PrintWriter(socket.getOutputStream(), true);
+            // socket = new Socket("localhost", 9090);
+            socket = new Socket("192.168.1.1", 9090);
+
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
             out.println(username);
+
+            ui = new ChatUI(username, e -> {
+                String msg = ui.getMessageAndClear();
+                if (!msg.isEmpty())
+                    out.println(msg);
+            });
+
+            new MessageReader().start();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "No se pudo conectar al servidor.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error al conectar: " + e.getMessage());
             System.exit(1);
         }
     }
 
-    private void listenMessages() {
-        new Thread(() -> {
+    private class MessageReader extends Thread {
+        public void run() {
             try {
                 String line;
                 while ((line = in.readLine()) != null) {
-                    chatArea.append(line + "\n");
+                    ui.appendMessage(line);
                 }
             } catch (IOException e) {
-                chatArea.append("\nConexión perdida con el servidor.\n");
+                JOptionPane.showMessageDialog(null, "Conexión perdida.");
             }
-        }).start();
-    }
-
-    private void sendMessage() {
-        String msg = inputField.getText().trim();
-        if (!msg.isEmpty()) {
-            out.println(msg);
-            inputField.setText("");
         }
     }
 
@@ -85,4 +55,3 @@ public class ChatClient {
         SwingUtilities.invokeLater(ChatClient::new);
     }
 }
-
