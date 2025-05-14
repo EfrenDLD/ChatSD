@@ -1,11 +1,14 @@
 package client;
 
 import client.ui.ChatUI;
+import client.ui.LoginFrame;
+
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
-import javax.swing.*;
 
 public class ChatClient {
+
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -13,32 +16,44 @@ public class ChatClient {
     private ChatUI ui;
 
     public ChatClient() {
-        this.username = JOptionPane.showInputDialog("Ingresa tu usuario:");
-        if (username == null || username.isEmpty())
-            System.exit(0);
+        // Primero crea la ventana
 
-        try {
-            // socket = new Socket("localhost", 9090);
-            socket = new Socket("192.168.1.1", 9090);
+        LoginFrame login = new LoginFrame(null);    // Luego le agregas el listener con acceso a la misma instancia
+        login.setLoginAction(e -> {
+            username = login.getUsername();
+            if (username == null || username.isEmpty()) {
+                JOptionPane.showMessageDialog(login, "Por favor ingresa un nombre.");
+                return;
+            }
 
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-            out.println(username);
+            login.dispose(); // Cierra la ventana de login
 
-            ui = new ChatUI(username, e -> {
-                String msg = ui.getMessageAndClear();
-                if (!msg.isEmpty())
-                    out.println(msg);
-            });
+            try {
+                socket = new Socket("localhost", 9090); // Usa tu IP si aplica
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
+                out.println(username);
 
-            new MessageReader().start();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al conectar: " + e.getMessage());
-            System.exit(1);
-        }
+                ui = new ChatUI(username, event -> {
+                    String msg = ui.getMessageAndClear();
+                    if (!msg.isEmpty()) {
+                        out.println(msg);
+                    }
+                });
+
+                new MessageReader().start();
+
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Error al conectar: " + ex.getMessage());
+                System.exit(1);
+            }
+        });
+
+        login.setVisible(true);
     }
 
     private class MessageReader extends Thread {
+
         public void run() {
             try {
                 String line;

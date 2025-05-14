@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.Set;
 
 public class ClientHandler extends Thread {
+
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
@@ -22,7 +23,7 @@ public class ClientHandler extends Thread {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             username = in.readLine();
-            broadcast("[Servidor]: " + username + " se ha unido.");
+            broadcast("[WASAAA]: " + username + " se ha unido.");
 
             String msg;
             while ((msg = in.readLine()) != null) {
@@ -35,7 +36,8 @@ public class ClientHandler extends Thread {
                 clients.remove(this);
                 broadcast("[Servidor]: " + username + " ha salido.");
                 socket.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 
