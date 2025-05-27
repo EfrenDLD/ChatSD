@@ -5,6 +5,8 @@ public class Emojis {
         return text.replace(":)", "😊")
                 .replace(":(", "😢")
                 .replace("<3", "❤️")
+                .replace(":c", "😌")
+                .replace(":p", "😏")
                 .replace(":D", "😄");
     }
 }
