@@ -1,12 +1,10 @@
 package client.ui;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-
 import java.awt.*;
 import java.awt.event.ActionListener;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 public class LoginFrame extends JFrame {
 
@@ -14,7 +12,7 @@ public class LoginFrame extends JFrame {
     private JButton loginButton;
 
     public LoginFrame(ActionListener onLogin) {
-        setTitle("Bienvenido a Los de Siempre");
+        setTitle("Bienvenido a Los Imparables");
         setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(450, 550);
@@ -52,7 +50,7 @@ public class LoginFrame extends JFrame {
             logo.setFont(new Font("Segoe UI", Font.PLAIN, 70));
         }
 
-        JLabel titleLabel = new JLabel("Los de Siempre");
+        JLabel titleLabel = new JLabel("Los imparables");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

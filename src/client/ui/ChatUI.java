@@ -29,7 +29,7 @@ public class ChatUI {
     private int colorIndex = 0;
 
     public ChatUI(String username, ActionListener sendListener) {
-        frame = new JFrame("Chat - " + username);
+        frame = new JFrame("Chat De - " + username);
         frame.setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 500);

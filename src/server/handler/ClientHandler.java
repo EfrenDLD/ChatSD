@@ -23,7 +23,7 @@ public class ClientHandler extends Thread {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             username = in.readLine();
-            broadcast("[WASAAA]: " + username + " se ha unido.");
+            broadcast("[BIENVENIDO AL CHAT]: " + username + " se ha unido.");
 
             String msg;
             while ((msg = in.readLine()) != null) {
