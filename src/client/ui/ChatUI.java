@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.swing.*;
 
 public class ChatUI {
+
     private JFrame frame;
     private JTextArea chatArea;
     private JTextField inputField;
@@ -18,13 +19,13 @@ public class ChatUI {
     private JScrollPane scrollPane;
     private final Map<String, Color> userColors = new HashMap<>();
     private final Color[] colorPalette = {
-            new Color(220, 248, 198), // verde claro
-            new Color(255, 242, 204), // amarillo suave
-            new Color(204, 229, 255), // azul cielo
-            new Color(255, 204, 229), // rosa claro
-            new Color(255, 224, 178), // naranja claro
-            new Color(225, 245, 254), // celeste
-            new Color(240, 240, 240) // gris claro
+        new Color(220, 248, 198), // verde claro
+        new Color(255, 242, 204), // amarillo suave
+        new Color(204, 229, 255), // azul cielo
+        new Color(255, 204, 229), // rosa claro
+        new Color(255, 224, 178), // naranja claro
+        new Color(225, 245, 254), // celeste
+        new Color(240, 240, 240) // gris claro
     };
     private int colorIndex = 0;
 
@@ -71,13 +72,6 @@ public class ChatUI {
     }
 
     public void appendMessage(String msg) {
-        if (msg.startsWith("IMG:")) {
-            // Imagen sin usuario, solo mostrar la imagen como está
-            JLabel label = new JLabel("[Imagen sin remitente]");
-            chatPanel.add(label);
-            return;
-        }
-
         String sender = "Sistema";
         String content = msg;
 
@@ -90,36 +84,44 @@ public class ChatUI {
 
         Color bgColor = getUserColor(sender);
 
-        JPanel msgPanel = new JPanel();
-        msgPanel.setLayout(new BorderLayout());
+        JPanel msgPanel = new JPanel(new BorderLayout());
         msgPanel.setBackground(bgColor);
         msgPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        msgPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        msgPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JLabel nameLabel = new JLabel(sender + ":");
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
 
-        JLabel msgLabel;
-        if (msg.startsWith("IMG:")) {
+        JComponent contentComponent;
+        if (content.startsWith("IMG:")) {
             try {
-                String base64 = msg.substring(4);
+                String base64 = content.substring(4); // Quitar "IMG:"
                 byte[] imageBytes = java.util.Base64.getDecoder().decode(base64);
                 ImageIcon icon = new ImageIcon(imageBytes);
-                msgLabel = new JLabel(icon);
+
+                // Escalado de imagen opcional si es muy grande
+                if (icon.getIconWidth() > 400) {
+                    Image scaled = icon.getImage().getScaledInstance(400, -1, Image.SCALE_SMOOTH);
+                    icon = new ImageIcon(scaled);
+                }
+
+                contentComponent = new JLabel(icon);
             } catch (Exception e) {
-                msgLabel = new JLabel("[Error al mostrar imagen]");
+                contentComponent = new JLabel("[Error al mostrar imagen]");
             }
         } else {
-            msgLabel = new JLabel(content);
-            msgLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            JLabel textLabel = new JLabel(content);
+            textLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            contentComponent = textLabel;
         }
 
         msgPanel.add(nameLabel, BorderLayout.NORTH);
-        msgPanel.add(msgLabel, BorderLayout.CENTER);
+        msgPanel.add(contentComponent, BorderLayout.CENTER);
 
         chatPanel.add(msgPanel);
         chatPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         chatPanel.revalidate();
+        chatPanel.repaint();
         scrollToBottom();
     }
 

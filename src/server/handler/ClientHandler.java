@@ -27,8 +27,15 @@ public class ClientHandler extends Thread {
 
             String msg;
             while ((msg = in.readLine()) != null) {
-                broadcast(username + ": " + msg);
+                if (msg.startsWith("IMG:")) {
+                    // Si es una imagen en base64, se envía sin prefijo de username
+                    broadcast(msg);
+                } else {
+                    // Mensaje de texto normal
+                    broadcast(username + ": " + msg);
+                }
             }
+
         } catch (IOException e) {
             System.err.println("Usuario desconectado: " + username);
         } finally {
